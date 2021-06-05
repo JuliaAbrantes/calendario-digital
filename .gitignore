@@ -6,6 +6,7 @@ db/
 *.cdb
 *.hdb
 incremental_db/README
+incremental_db
 *.done
 *.dpi
 *.sig

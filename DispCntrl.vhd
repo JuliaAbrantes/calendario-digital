@@ -9,18 +9,21 @@ end DispCntrl;
 
 
 architecture FSM of DispCntrl is
-type Tstate is (s1, s2, s3, s4, s5, s6, s7, s8);
-signal Pstate, Nstate : Tstate := s1;
+type Tstate is (s0, s1, s2, s3, s4, s5, s6, s7, s8);
+signal Pstate, Nstate : Tstate := s0;
 begin
 	sequencical : process(clk) --determina o próximo estado
 	begin
 		if(rising_edge(clk))then
 		
 			case Pstate is
+			when s0 	=>
+				Nstate <= s1;
+				
 			when s1 	=>
 				Nstate <= s2;
 				
-			when s2 		=>
+			when s2 	=>
 				Nstate <= s3;
 				
 			when s3 	=>
@@ -46,9 +49,12 @@ begin
 	end process;
 	
 	
-	combinational : process --determina a saídaw
+	combinational : process(Pstate) --determina a saídaw
 	begin
 			case Pstate is
+			when s0 	=>
+				sel <= "XXX";
+				
 			when s1 	=>
 				sel <= "000"; --seleciona a entrada sel + 1
 				

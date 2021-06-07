@@ -1,12 +1,11 @@
-calendario.qpf
-calendario.qsf
+*.qpf
+*.qsf
 db/
 *.db_info
 *.hb_info
 *.cdb
 *.hdb
-incremental_db/README
-incremental_db
+incremental_db/
 *.done
 *.dpi
 *.sig

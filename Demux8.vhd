@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
 entity Demux8 is
-port(sel		: in std_logic;
+port(encodedIn : in std_logic_vector(2 downto 0);
 	  Dout1 	: out std_logic;
 	  Dout2 	: out std_logic;
 	  Dout3 	: out std_logic;
@@ -16,18 +16,18 @@ end Demux8;
 architecture Behavioral of Demux8 is
 begin
 
-	process(sel)
+	process(encodedIn)
 	begin
-		Dout1 	=> '0';
-		Dout2 	=> '0';
-		Dout3 	=> '0';
-		Dout4 	=> '0';
-		Dout5 	=> '0';
-		Dout6 	=> '0';
-		Dout7 	=> '0';
-		Dout8 	=> '0';
+		Dout1 <= '0';
+		Dout2 <= '0';
+		Dout3 <= '0';
+		Dout4 <= '0';
+		Dout5 <= '0';
+		Dout6 <= '0';
+		Dout7 <= '0';
+		Dout8 <= '0';
 
-		case sel is
+		case encodedIn is
 		when "000" =>
 			Dout1 <= '1';
 		when "001" =>

@@ -15,9 +15,9 @@ begin
 
 	process(clk)
 	begin
-		if(rising_edge(ckl)) then
+		if(rising_edge(clk)) then
 			if(Res = '1') then
-				Q <= others => '0';
+				Q <= (others => '0');
 			elsif(En = '1') then
 				Q <= D;
 			end if;

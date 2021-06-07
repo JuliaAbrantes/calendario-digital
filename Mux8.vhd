@@ -2,38 +2,32 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
 entity Mux8 is
-	port( sel 	: in std_logic;
-		 Din1 	: in std_logic;
-		 Din2 	: in std_logic;
-		 Din3 	: in std_logic;
-		 Din4 	: in std_logic;
-		 Din5 	: in std_logic;
-		 Din6 	: in std_logic;
-		 Din7 	: in std_logic;
-		 Din8 	: in std_logic;
-		 DataOut : out std_logic;
+	port( sel 	: in std_logic_vector(2 downto 0);
+		 Din1 	: in std_logic_vector(3 downto 0);
+		 Din2 	: in std_logic_vector(3 downto 0);
+		 Din3 	: in std_logic_vector(3 downto 0);
+		 Din4 	: in std_logic_vector(3 downto 0);
+		 Din5 	: in std_logic_vector(3 downto 0);
+		 Din6 	: in std_logic_vector(3 downto 0);
+		 Din7 	: in std_logic_vector(3 downto 0);
+		 Din8 	: in std_logic_vector(3 downto 0);
+		 DataOut : out std_logic_vector(3 downto 0));
 end Mux8;
 
 
 
 architecture Behavioral of Mux8 is
 begin
-	case sel is
-	when 000 =>
-		DataOut <= Din1;
-	when 001 =>
-		DataOut <= Din2;
-	when 010 =>
-		DataOut <= Din3;
-	when 011 =>
-		DataOut <= Din4;
-	when 100 =>
-		DataOut <= Din5;
-	when 101 =>
-		DataOut <= Din6;
-	when 110 =>
-		DataOut <= Din7;
-	when 111 =>
-		DataOut <= Din8;	
-	end case;
+	
+	with sel select Dataout <=
+							Din1 when "000",
+							Din2 when "001",
+							Din3 when "010",
+							Din4 when "011",
+							Din5 when "100",
+							Din6 when "101",
+							Din7 when "110",
+							Din8 when "111";
+	
+	
 end Behavioral;

@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
-entity BasicWatch is
+entity calendario is
 	port(SW			: in  std_logic_vector(0 downto 0);
 		  CLOCK_50	: in  std_logic;
 		  HEX0		: out std_logic_vector(6 downto 0);
@@ -9,11 +9,12 @@ entity BasicWatch is
 		  HEX2		: out std_logic_vector(6 downto 0);
 		  HEX3		: out std_logic_vector(6 downto 0);
 		  LEDG		: out std_logic_vector(0 downto 0));
-end BasicWatch;
+end calendario;
 
-architecture Structural of BasicWatch is
-signal s_Res, s_progClk, s_timeClk, s_displayClk: std_logic_vector;
+architecture Structural of calendario is
+signal s_Res, s_progClk, s_timeClk, s_dispClk: std_logic;
 signal s_dayTerm, s_monthTerm : std_logic;
+signal s_sel : std_logic_vector(2 downto 0);
 
 signal regEn_day_units, regEn_day_tens : std_logic;
 signal regEn_month_units, regEn_month_tens : std_logic;
@@ -32,8 +33,8 @@ begin
 							port map(clkIn => CLOCK_50,
 										progClk => s_progClk,
 										timeClk => s_timeClk,
-										displayClk = s_displayClk);
-	LEDG(0) <= timeClk; --provisório
+										dispClk => s_dispClk);
+	LEDG(0) <= s_timeClk; --provisório
 
 
 	day_counter : entity work.PCounter4(RTL)
@@ -66,7 +67,7 @@ begin
 	
 	dispUpdate : entity work.DispCntrl(FSM)
 							port map(clk 		=> CLOCK_50,
-										En 		=> dispCntrl,
+										En 		=> s_dispClk,
 										sel 		=> s_sel);
 										
 	demultiplexer : entity work.Demux8(Behavioral) --separa o seletor em enables de registos
@@ -95,8 +96,7 @@ begin
 	
 	
 	Decoder : entity work.Bin7SegDecoder(RTL)
-							port map(enable	=> s_sel,
-										binInput	=> s_data,
+							port map(binInput	=> s_data,
 										decOut_n	=> s_decodedValue);
 										
 			

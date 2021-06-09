@@ -26,6 +26,10 @@ signal regEn_month_units, regEn_month_tens : std_logic;
 signal regEn_year_units, regEn_year_tens : std_logic;
 signal regEn_year_hund, regEn_year_thou : std_logic;
 
+--signal s_max_days : std_logic_vector(4 downto 0);
+signal s_max_days : natural;
+signal s_max_en : std_logic;
+
 signal s_day, s_month, s_data : std_logic_vector(3 downto 0);
 signal s_year1, s_year2, s_year3, s_year4 : std_logic_vector(3 downto 0);
 signal s_day_units, s_day_tens, s_month_units, s_month_tens : std_logic_vector(3 downto 0);
@@ -43,11 +47,18 @@ begin
 	LEDG(0) <= s_timeClk; --provisório
 
 	
+	days_control : entity work.mainCntrl(Behavioral)
+						  port map(clk			=> CLOCK_50,
+									  TCmonth	=> s_dayTerm,
+									  max_days	=> s_max_days,
+									  max_en		=> s_max_en);
+	
 	
 
-	day_counter : entity work.PCounter4(RTL)
-							generic map(MAX	=> 31)
-							port map(Res		=> s_Res,
+	day_counter : entity work.PCounter5(RTL)
+							port map(max		=> s_max_days,
+										loadEn	=> s_max_en,
+										Res		=> s_Res,
 										clk		=> CLOCK_50,
 										En			=> s_timeClk,
 										Q			=> s_day,
@@ -61,8 +72,8 @@ begin
 							
 										
 	month_counter : entity work.PCounter4(RTL)
-							generic map(MAX	=> 12)
-							port map(Res		=> s_Res,
+							port map(max		=> 12,
+										Res		=> s_Res,
 										clk		=> CLOCK_50,
 										En			=> s_dayTerm,
 										Q			=> s_month,
@@ -76,8 +87,8 @@ begin
 						
 						
 	year1_counter : entity work.PCounter4(RTL) --year units
-							generic map(MAX	=> 9)
-							port map(Res		=> s_Res,
+							port map(max		=> 9,
+										Res		=> s_Res,
 										clk		=> CLOCK_50,
 										En			=> s_monthTerm,
 										Q			=> s_year1,
@@ -91,8 +102,8 @@ begin
 					
 					
 	year2_counter : entity work.PCounter4(RTL) --year units
-							generic map(MAX	=> 9)
-							port map(Res		=> s_Res,
+							port map(max		=> 9,
+										Res		=> s_Res,
 										clk		=> CLOCK_50,
 										En			=> s_year1Term,
 										Q			=> s_year2,
@@ -106,8 +117,8 @@ begin
 					
 					
 	year3_counter : entity work.PCounter4(RTL) --year units
-							generic map(MAX	=> 9)
-							port map(Res		=> s_Res,
+							port map(max		=> 9,
+										Res		=> s_Res,
 										clk		=> CLOCK_50,
 										En			=> s_year2Term,
 										Q			=> s_year3,
@@ -121,8 +132,8 @@ begin
 					
 										
 	year4_counter : entity work.PCounter4(RTL) --year units
-							generic map(MAX	=> 9)
-							port map(Res		=> s_Res,
+							port map(max		=> 9,
+										Res		=> s_Res,
 										clk		=> CLOCK_50,
 										En			=> s_year3Term,
 										Q			=> s_year4,

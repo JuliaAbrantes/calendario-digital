@@ -18,7 +18,7 @@ begin
 
 	process(encodedIn)
 	begin
-		Dout1 <= '0';
+		Dout1 <= '0'; --caso a entrada seja "XXX" fica tudo a 0 e nenhum registro é ativado
 		Dout2 <= '0';
 		Dout3 <= '0';
 		Dout4 <= '0';

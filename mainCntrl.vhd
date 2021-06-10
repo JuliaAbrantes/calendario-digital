@@ -12,18 +12,25 @@ end mainCntrl;
 
 
 architecture Behavioral of mainCntrl is
-type Tstate is (progDez, Jan, progJan, Fev, progFev, Mar, progMar, Abr, progAbr, Mai, 
-progMai, Jun, progJun, Jul, progJul, Ago, progAgo, Set, progSet, Outu, progOutu, 
-Nov, progNov, Dez);
+	type Tstate is (progDez, Jan, progJan, Fev, progFev, Mar, progMar, Abr, progAbr, Mai, 
+	progMai, Jun, progJun, Jul, progJul, Ago, progAgo, Set, progSet, Outu, progOutu, 
+	Nov, progNov, Dez);
 
-signal Pstate, Nstate: Tstate := progJan;
+	signal Pstate, Nstate: Tstate := progJan;
+	--signal s_max_days : natural;
 begin
 
 	sequencial : process(clk)
-	begin
+	begin --autaliza o estado atual
 		if(rising_edge(clk)) then
-			Nstate <= Pstate;
-			case Pstate is
+			Pstate <= Nstate;
+		end if;
+	end process;
+
+	combinational : process(Pstate, TCmonth)
+	begin
+		Nstate <= Pstate; --valor por defeito
+		case Pstate is --decide o próximo estados
 			when Jan =>
 				if	(TCmonth = '1') then
 					Nstate <= progFev;
@@ -97,26 +104,29 @@ begin
 			when progDez =>
 				Nstate <= Jan;
 			end case;
-		end if;
-		Pstate <= Nstate;
-	end process;
-
-	combinational : process(Pstate)
-	begin
-		if(Pstate = Jan or Pstate = Mar or Pstate = MAi or PState = Jul or PState = Ago or 
+		
+		
+		--decide as saídas
+		if(Pstate = Jan or Pstate = Mar or Pstate = Mai or
+			PState = Jul or PState = Ago or 
 			Pstate = Outu or Pstate = Dez) then
-				--max_days <= std_logic_vector(to_unsigned(31,5));
-				max_days <= 31;
+				--max_days 		<= std_logic_vector(to_unsigned(31,5));
+				max_days 		<= 31;
+				--s_max_days 	<= 31;
 				max_en <= '0';
 		elsif (PState = Fev) then
-				--max_days <= std_logic_vector(to_unsigned(28,5));
-				max_days <= 28;
-				max_en <= '0';
+				--max_days 		<= std_logic_vector(to_unsigned(28,5));
+				max_days 		<= 28;
+				--s_max_days 	<= 28;
+				max_en 			<= '0';
 		elsif(Pstate = Abr or Pstate = Jun or Pstate = Set or PState = Nov) then
-				--max_days <= std_logic_vector(to_unsigned(30,5));
-				max_days <= 30;
-				max_en <= '0';
+				--max_days 		<= std_logic_vector(to_unsigned(30,5));
+				max_days 		<= 30;
+				--s_max_days 	<= 30;
+				max_en 			<= '0';
 		else --no caso de ser um estado de transição
+				--max_days 		<= s_max_days;
+				--s_max_days 	<= s_max_days;
 				max_en <= '1';
 		end if;
 		

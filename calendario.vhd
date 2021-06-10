@@ -19,7 +19,7 @@ architecture Structural of calendario is
 signal s_Res, s_progClk, s_timeClk, s_dispClk: std_logic;
 signal s_dayTerm, s_monthTerm : std_logic;
 signal s_year1Term, s_year2Term, s_year3Term : std_logic;
-signal s_sel : std_logic_vector(2 downto 0);
+signal s_selMux : std_logic_vector(2 downto 0);
 
 signal regEn_day_units, regEn_day_tens : std_logic;
 signal regEn_month_units, regEn_month_tens : std_logic;
@@ -35,6 +35,8 @@ signal s_year1, s_year2, s_year3, s_year4 : std_logic_vector(3 downto 0);
 signal s_day_units, s_day_tens, s_month_units, s_month_tens : std_logic_vector(3 downto 0);
 signal s_year_units, s_year_tens, s_year_hund, s_year_thou : std_logic_vector(3 downto 0);
 signal s_decodedValue : std_logic_vector(6 downto 0);
+signal s_regEn : std_logic_vector(7 downto 0);
+
 begin
 	s_Res	<= not SW(0); --provisório
 	
@@ -47,15 +49,15 @@ begin
 	LEDG(0) <= s_timeClk; --provisório
 
 	
-	days_control : entity work.mainCntrl(Behavioral)
-						  port map(clk			=> CLOCK_50,
-									  TCmonth	=> s_dayTerm,
-									  max_days	=> s_max_days,
-									  max_en		=> s_max_en);
+--	days_control : entity work.mainCntrl(Behavioral)
+--						  port map(clk			=> CLOCK_50,
+--									  TCmonth	=> s_dayTerm,
+--									  max_days	=> s_max_days,
+--									  max_en		=> s_max_en);
 	
 	
 
-	day_counter : entity work.PCounter5(RTL)
+	day_counter : entity work.Counter5(RTL)
 							port map(max		=> s_max_days,
 										loadEn	=> s_max_en,
 										Res		=> s_Res,
@@ -71,7 +73,7 @@ begin
 							
 							
 										
-	month_counter : entity work.PCounter4(RTL)
+	month_counter : entity work.Counter4(RTL)
 							port map(max		=> 12,
 										Res		=> s_Res,
 										clk		=> CLOCK_50,
@@ -86,7 +88,7 @@ begin
 										
 						
 						
-	year1_counter : entity work.PCounter4(RTL) --year units
+	year1_counter : entity work.SimpleCounter(RTL) --year units
 							port map(max		=> 9,
 										Res		=> s_Res,
 										clk		=> CLOCK_50,
@@ -101,7 +103,7 @@ begin
 										
 					
 					
-	year2_counter : entity work.PCounter4(RTL) --year units
+	year2_counter : entity work.SimpleCounter(RTL) --year tens
 							port map(max		=> 9,
 										Res		=> s_Res,
 										clk		=> CLOCK_50,
@@ -116,7 +118,7 @@ begin
 										
 					
 					
-	year3_counter : entity work.PCounter4(RTL) --year units
+	year3_counter : entity work.SimpleCounter(RTL) --year hundreds
 							port map(max		=> 9,
 										Res		=> s_Res,
 										clk		=> CLOCK_50,
@@ -131,7 +133,7 @@ begin
 					
 					
 										
-	year4_counter : entity work.PCounter4(RTL) --year units
+	year4_counter : entity work.SimpleCounter(RTL) --year thousands
 							port map(max		=> 9,
 										Res		=> s_Res,
 										clk		=> CLOCK_50,
@@ -152,22 +154,22 @@ begin
 	dispUpdate : entity work.DispCntrl(FSM)
 							port map(clk 		=> CLOCK_50,
 										En 		=> s_dispClk,
-										sel 		=> s_sel);
+										selMux 	=> s_selMux,
+										selReg	=> s_regEn);
 										
-	demultiplexer : entity work.Demux8(Behavioral) --separa o seletor em enables de registos
-							port map(encodedIn => s_sel,
-										 Dout1 	=> regEn_day_units,
-										 Dout2 	=> regEn_day_tens,
-										 Dout3 	=> regEn_month_units,
-										 Dout4 	=> regEn_month_tens,
-										 Dout5 	=> regEn_year_units,
-										 Dout6 	=> regEn_year_tens,
-										 Dout7 	=> regEn_year_hund,
-										 Dout8 	=> regEn_year_thou);
+	
+	 regEn_day_units 		<= s_regEn(0); --separa s_regEn em sinais de En diferentes --provisório
+	 regEn_day_tens 		<= s_regEn(1);
+	 regEn_month_units 	<= s_regEn(2);
+	 regEn_month_tens 	<= s_regEn(3);
+	 regEn_year_units 	<= s_regEn(4);
+	 regEn_year_tens 		<= s_regEn(5);
+	 regEn_year_hund 		<= s_regEn(6);
+	 regEn_year_thou 		<= s_regEn(7);	 
 	
 										
 	multiplexer : entity work.Mux8(Behavioral)
-							port map( sel 		=> s_sel,
+							port map( sel 		=> s_selMux,
 										 Din1 	=> s_day_units,
 										 Din2 	=> s_day_tens,
 										 Din3 	=> s_month_units,

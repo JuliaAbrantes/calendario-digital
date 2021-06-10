@@ -4,13 +4,15 @@ use IEEE.STD_LOGIC_1164.all;
 entity DispCntrl is
 	port(clk : in std_logic;
 		  En : in std_logic;
-		  sel : out std_logic_vector(2 downto 0));
+		  selMux : out std_logic_vector(2 downto 0);
+		  selReg : out std_logic_vector(7 downto 0));
 end DispCntrl;
 
 
 architecture FSM of DispCntrl is
-type Tstate is (s0, s1, s2, s3, s4, s5, s6, s7, s8);
-signal Pstate, Nstate : Tstate := s0;
+	type Tstate is (s0, s1, s2, s3, s4, s5, s6, s7, s8);
+	signal Pstate : Tstate := s0;
+	signal Nstate : Tstate;
 begin
 	sequencical : process(clk) --determina o próximo estado
 	begin
@@ -45,39 +47,50 @@ begin
 				Nstate <= s1;
 			end case;
 			
+			Pstate <= Nstate;
+			
 		end if;
 	end process;
 	
 	
-	combinational : process(Pstate) --determina a saídaw
+	combinational : process(Pstate) --determina a saída
 	begin
 			case Pstate is
 			when s0 	=>
-				sel <= "XXX";
+				selMux <= "000";
+				selReg <= "00000000"; --não registra nenhum valor
 				
 			when s1 	=>
-				sel <= "000"; --seleciona a entrada sel + 1
+				selMux <= "000"; --seleciona a entrada sel + 1
+				selReg <= "00000001";
 				
 			when s2 		=>
-				sel <= "001";
+				selMux <= "001";
+				selReg <= "00000010";
 				
 			when s3 	=>
-				sel <= "010";
+				selMux <= "010";
+				selReg <= "00000100";
 				
 			when s4 	=>
-				sel <= "011";
+				selMux <= "011";
+				selReg <= "00001000";
 				
 			when s5 	=>
-				sel <= "100";
+				selMux <= "100";
+				selReg <= "00010000";
 				
 			when s6 	=>
-				sel <= "101";
+				selMux <= "101";
+				selReg <= "00100000";
 				
-			when s7 		=>
-				sel <= "110";
+			when s7 	=>
+				selMux <= "110";
+				selReg <= "01000000";
 				
 			when s8 	=>
-				sel <= "111";
+				selMux <= "111";
+				selReg <= "10000000";
 			end case;
 	end process;
 

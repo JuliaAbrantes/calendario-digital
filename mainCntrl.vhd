@@ -127,7 +127,9 @@ begin
 		else --no caso de ser um estado de transição
 				--max_days 		<= s_max_days;
 				--s_max_days 	<= s_max_days;
-				max_en <= '1';
+				if(falling_edge(TCmonth)) then --só ativa quando o sinal TCmonth for a 0
+					max_en <= '1';
+				end if;
 		end if;
 		
 	end process;

@@ -23,7 +23,7 @@ begin
 		if (rising_edge(clk)) then
 			if (Res = '1') then
 --				s_value <= (others => '0');
-				s_value <= "0001"; --quando é feito reset, fica com 1
+				s_value <= "0000"; --quando é feito reset, fica com 0
 				TC <= '0';
 --			elsif ((enable1 = '1') and (enable2 = '1')) then
 			elsif (En = '1') then

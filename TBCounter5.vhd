@@ -27,15 +27,11 @@ begin
 		wait for cycle;
 		s_Res <= '0';
 		wait for cycle;
-		s_loadEn <= '1';
-		wait for cycle;
-		s_loadEn <= '0';
 		wait for cycle*40;
 	end process;
 	
 	uut : entity work.Counter5(Behavioral)
 	port map ( max 	=> s_max,
-				  loadEn => s_loadEn,
 				  Res 	=> s_Res,
 				  clk 	=> CLOCK_50,
 				  En 		=> s_En,

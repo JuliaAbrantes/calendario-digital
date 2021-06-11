@@ -4,7 +4,6 @@ use IEEE.NUMERIC_STD.all;
 
 entity Counter5 is --conta de 1 a max
 	port(max 		: in natural := 30;
-		  loadEn    : in std_logic;
 		  Res 		: in  std_logic;
 		  clk			: in  std_logic;
 --		  enable1	: in  std_logic;
@@ -25,7 +24,7 @@ begin
 		if (rising_edge(clk)) then
 			if (Res = '1') then
 --				s_value <= (others => '0');
-				s_value <= "0001"; --quando é feito reset, fica com 1
+				s_value <= "0000"; --quando é feito reset, fica a 0
 				TC <= '0';
 --			elsif ((enable1 = '1') and (enable2 = '1')) then
 			elsif (En = '1') then
@@ -41,12 +40,6 @@ begin
 						TC <= '0';
 					end if;
 				end if;
-			end if;
-			
-			if(loadEn = '1') then
-				s_max <= max;
-			else
-				s_max <= s_max;
 			end if;
 			
 		end if;

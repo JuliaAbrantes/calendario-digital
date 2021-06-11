@@ -14,3 +14,7 @@ incremental_db/
 *.summary
 *.bak
 simulation/
+*.cdf
+*.smsg
+*.jdi
+output_files/

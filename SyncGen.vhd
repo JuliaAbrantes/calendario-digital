@@ -14,17 +14,12 @@ end SyncGen;
 
 
 architecture RTL of SyncGen is
-	
 
 	constant number_seconds : positive := 50000000;
 	constant number_milisseconds : positive := 50000;
 	signal s_counter_prog : natural range 0 to ( number_seconds - 1 );
 	signal s_counter_disp : natural range 0 to ( number_milisseconds - 1 ); 
 	signal s_counter_time : natural range 0 to ( number_seconds - 1 );
-	
-	
-	
-	
 	
 begin
 	process(clkIn)

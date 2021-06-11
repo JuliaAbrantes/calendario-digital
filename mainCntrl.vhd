@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.all;
 entity mainCntrl is
 port (clk : in std_logic;
 		--max_days : out std_logic_vector(4 downto 0);
-		max_days : out natural);
+		max_days : out natural := 31);
 end mainCntrl;
 
 

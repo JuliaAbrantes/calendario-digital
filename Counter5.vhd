@@ -40,5 +40,5 @@ begin
 		
 	end process;
 
-	Q <= std_logic_vector(s_value);
+	Q <= std_logic_vector(to_unsigned(s_value,5));
 end RTL;

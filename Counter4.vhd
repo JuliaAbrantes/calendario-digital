@@ -13,22 +13,22 @@ end Counter4;
 
 architecture RTL of Counter4 is
 
-	signal s_value : unsigned(3 downto 0) := "0001"; --começa  a contagem em 1
+	signal s_value : integer := 1; --começa  a contagem em 1
 
 begin
 	process(Res, clk) --reset assíncrono
 	begin
 		if (rising_edge(clk)) then
 			if (Res = '1') then
-				s_value <= "0001"; --quando é feito reset, fica a 1
+				s_value <= 1; --quando é feito reset, fica a 1
 				TC <= '0';
 			elsif (En = '1') then
-				if (to_integer(s_value) = to_integer(unsigned(max))) then --volta a 1
-					s_value <= "0001";
+				if ( s_value = to_integer(unsigned(max))) then --volta a 1
+					s_value <= 1;
 					TC <= '0';
 				else
 					s_value <= s_value + 1;
-					if (to_integer(s_value) = to_integer(unsigned(max)) - 1) then --terminou a contagem
+					if ( s_value = to_integer(unsigned(max)) - 1) then --terminou a contagem
 						TC <= '1';
 					else
 						TC <= '0';
@@ -40,5 +40,5 @@ begin
 		
 	end process;
 
-	Q <= std_logic_vector(s_value);
+	Q <= std_logic_vector(to_unsigned(s_value,4));
 end RTL;

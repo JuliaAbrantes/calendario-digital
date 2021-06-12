@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 entity Counter5 is --conta de 1 a max
-	port(max 		: in std_logic_vector(4 downto 0);
+	port(max 		: in std_logic_vector(4 downto 0) := std_logic_vector(to_unsigned(32,5)); --conta até 32 por defeito
 		  Res 		: in  std_logic;
 		  clk			: in  std_logic;
 		  En	      : in  std_logic;
@@ -13,7 +13,8 @@ end Counter5;
 
 architecture RTL of Counter5 is
 
-	signal s_value : integer := 1; --começa  a contagem em 1
+	--signal s_value : integer := 1; --começa  a contagem em 1
+	signal s_value : natural range 0 to 32 := 1; --range garante um output válido
 
 begin
 	process(Res, clk) --reset assíncrono

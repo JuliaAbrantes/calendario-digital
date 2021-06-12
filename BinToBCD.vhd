@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 entity BinToBCD is
-generic (Nbits	  : positive := 4);
+generic (Nbits	  : positive := 5);
 port ( Bin       : in std_logic_vector(NBits-1 downto 0); --o numero de bits da entrada é dado pelo generic
 		 units_out : out std_logic_vector(3 downto 0);
 		 tens_out  : out std_logic_vector(3 downto 0));

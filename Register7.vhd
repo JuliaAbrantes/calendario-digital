@@ -5,7 +5,7 @@ entity Register7 is
 port (Res : in std_logic;
 		clk : in std_logic;
 		En  : in std_logic;
-		D	 : in std_logic_vector(6 downto 0);
+		D	 : in std_logic_vector(6 downto 0) := "1111111";
 		Q   : out std_logic_vector(6 downto 0));
 end Register7;
 

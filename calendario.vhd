@@ -18,32 +18,28 @@ entity calendario is
 end calendario;
 
 architecture Structural of calendario is
-signal s_Res, s_progClk, s_timeClk, s_dispClk: std_logic;
-signal s_key : std_logic_vector(2 downto 0);
-signal s_mode : std_logic := '0'; --0 é run e 1 é program
+	signal s_Res, s_progClk, s_timeClk, s_dispClk: std_logic;
+	signal s_key : std_logic_vector(2 downto 0);
 
-signal s_dayTerm, s_monthTerm, s_year1Term, s_year2Term, s_year3Term : std_logic := '0';
-signal s_monthEn, s_year1En, s_year2En, s_year3En, s_year4En : std_logic := '0';
+	signal s_dayTerm, s_monthTerm, s_year1Term, s_year2Term, s_year3Term : std_logic := '0';
+	signal s_monthEn, s_year1En, s_year2En, s_year3En, s_year4En : std_logic := '0';
 
-signal s_selMux : std_logic_vector(2 downto 0);
+	signal s_selMux : std_logic_vector(2 downto 0);
 
-signal s_max_days : std_logic_vector(4 downto 0);
-signal s_max_en : std_logic;
+	signal s_max_days : std_logic_vector(4 downto 0);
+	signal s_max_en : std_logic;
 
-signal s_day, s_month : std_logic_vector(4 downto 0);
-signal s_data : std_logic_vector(3 downto 0);
-signal s_year1, s_year2, s_year3, s_year4 : std_logic_vector(3 downto 0);
-signal s_day_units, s_day_tens, s_month_units, s_month_tens : std_logic_vector(3 downto 0);
-signal s_year_units, s_year_tens, s_year_hund, s_year_thou : std_logic_vector(3 downto 0);
+	signal s_day, s_month : std_logic_vector(4 downto 0);
+	signal s_data : std_logic_vector(3 downto 0);
+	signal s_year1, s_year2, s_year3, s_year4 : std_logic_vector(3 downto 0);
+	signal s_day_units, s_day_tens, s_month_units, s_month_tens : std_logic_vector(3 downto 0);
+	signal s_year_units, s_year_tens, s_year_hund, s_year_thou : std_logic_vector(3 downto 0);
 
 signal s_decodedValue : std_logic_vector(6 downto 0);
---signal s_decodedValue1, s_decodedValue2, s_decodedValue3, s_decodedValue4, 
---			s_decodedValue5, s_decodedValue6, s_decodedValue7, s_decodedValue8 : std_logic_vector(6 downto 0); --provisório
 			
 signal s_regEn : std_logic_vector(7 downto 0);
 
 begin
-	s_mode <= '0'; --provisório
 
 	clearSW: process (CLOCK_50)
 	begin
@@ -53,14 +49,14 @@ begin
 	end process;
 
 	--só faz enable do próximo quando receber o enable pra si e a contagem dos anteriores todos acabar
-	s_monthEn <= (s_dayTerm and s_timeClk and not s_mode);
-	s_year1En <= (s_monthEn and s_monthTerm and not s_mode);
-	s_year2En <= (s_year1En and s_year1Term and not s_mode);
-	s_year3En <= (s_year2En and s_year2Term and not s_mode);
-	s_year4En <= (s_year3En and s_year3Term and not s_mode);
+	s_monthEn <= (s_dayTerm and s_timeClk);
+	s_year1En <= (s_monthEn and s_monthTerm);
+	s_year2En <= (s_year1En and s_year1Term);
+	s_year3En <= (s_year2En and s_year2Term);
+	s_year4En <= (s_year3En and s_year3Term);
 	
 	
---debouncers
+--debouncer do key 0 (reset geral)
 	key0: entity work.DebounceUnit(Behavioral)
 	generic map(kHzClkFreq		=> 50000,
 	            mSecMinInWidth => 100,
@@ -69,24 +65,6 @@ begin
 	port map (refClk	  	=>  CLOCK_50,
 		       dirtyIn		=>  KEY(0),
 		       pulsedOut	=>  s_key(0));
- 
-  key1: entity work.DebounceUnit(Behavioral)
-	generic map(kHzClkFreq		=> 50000,
-	            mSecMinInWidth => 100,
-			      inPolarity		=> '0',
-			      outPolarity		=>'1')
-	port map (refClk	  	=>  CLOCK_50,
-		       dirtyIn		=>  KEY(1),
-		       pulsedOut	=>  s_key(1));
-		 
-   key2: entity work.DebounceUnit(Behavioral)
-	generic map(kHzClkFreq		=> 50000,
-	            mSecMinInWidth => 100,
-			      inPolarity		=> '0',
-			      outPolarity		=>'1')	
-	port map (refClk	  	=>  CLOCK_50,
-		       dirtyIn		=>  KEY(2),
-		       pulsedOut	=>  s_key(2));
 	
 	
 	
@@ -99,13 +77,12 @@ begin
 	LEDG(0) <= s_timeClk; --provisório
 
 	
---	days_control : entity work.daysCntrl(Behavioral) --gera o numero máximo de dias
---						  port map(clk			=> CLOCK_50,
---									  month 		=> s_month, --unsigned
---									  max_days	=> s_max_days); --natural
+	days_control : entity work.daysCntrl(Behavioral) --gera o numero máximo de dias
+						  port map(clk			=> CLOCK_50,
+									  month 		=> s_month,
+									  max_days	=> s_max_days);
 	
 	
-	s_max_days <=  std_logic_vector(to_unsigned(31,5)); --provisório
 	day_counter : entity work.Counter5(RTL)
 							port map(max		=> s_max_days,
 										Res		=> s_Res,

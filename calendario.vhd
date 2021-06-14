@@ -74,7 +74,6 @@ begin
 										progClk => s_progClk,
 										timeClk => s_timeClk,
 										dispClk => s_dispClk);
-	LEDG(0) <= s_timeClk; --provisório
 
 	
 	days_control : entity work.daysCntrl(Behavioral) --gera o numero máximo de dias

@@ -19,3 +19,4 @@ simulation/
 *.jdi
 output_files/
 *.bsf
+*.qws

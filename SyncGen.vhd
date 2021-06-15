@@ -44,7 +44,7 @@ begin
 		end if;
 	end process;
 	
-	timeClk <= '1' when s_counter_time = 0 and en = '1' else --fica a 1 se for 0 e estivermos a usar o 
+	timeClk <= '1' when s_counter_time = 49999999 and en = '1' else --fica a 1 se for 0 e estivermos a usar o 
 				  '0';
 	
 	dispClk <= '1' when s_counter_disp = 0 and en = '1' else

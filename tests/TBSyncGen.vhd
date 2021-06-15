@@ -3,15 +3,12 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 
-entity TBcalendario is
-end TBcalendario;
+entity TBSyncGen is
+end TBSyncGen;
 
 
-architecture simulation of TBcalendario is
-	signal s_SW : std_logic_vector(0 downto 0);
-	signal s_HEX0, s_HEX1, s_HEX2, s_HEX3, s_HEX4,
-			 s_HEX5,	 s_HEX6,  s_HEX7: std_logic_vector(6 downto 0);
-	signal clk : std_logic;
+architecture simulation of TBSyncGen is
+	signal 
 	constant cycle : time := 20 ns;
 
 begin

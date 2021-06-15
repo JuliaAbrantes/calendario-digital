@@ -18,23 +18,20 @@ end calendario;
 architecture Structural of calendario is
 	signal s_Res, s_timeClk, s_dispClk: std_logic;
 
-	signal s_dayTerm, s_monthTerm, s_year1Term, s_year2Term, s_year3Term : std_logic := '0';
+	signal s_dayTerm, s_monthTerm, s_year1Term, s_year2Term, s_year3Term : std_logic := '0'; --fins e inicios da contagem
 	signal s_monthEn, s_year1En, s_year2En, s_year3En, s_year4En : std_logic := '0';
 
-	signal s_selMux : std_logic_vector(2 downto 0);
-
 	signal s_max_days : std_logic_vector(4 downto 0);
-	signal s_max_en : std_logic;
 
 	signal s_day, s_month : std_logic_vector(4 downto 0);
 	signal s_data : std_logic_vector(3 downto 0);
 	signal s_year1, s_year2, s_year3, s_year4 : std_logic_vector(3 downto 0);
-	signal s_day_units, s_day_tens, s_month_units, s_month_tens : std_logic_vector(3 downto 0);
+	signal s_day_units, s_day_tens, s_month_units, s_month_tens : std_logic_vector(3 downto 0); --valores
 	signal s_year_units, s_year_tens, s_year_hund, s_year_thou : std_logic_vector(3 downto 0);
 
-signal s_decodedValue : std_logic_vector(6 downto 0);
-			
-signal s_regEn : std_logic_vector(7 downto 0);
+	signal s_selMux : std_logic_vector(2 downto 0);
+	signal s_decodedValue : std_logic_vector(6 downto 0);
+	signal s_regEn : std_logic_vector(7 downto 0);
 
 begin
 
@@ -44,13 +41,6 @@ begin
 			s_Res	<= SW(0);
 		end if;
 	end process;
-
-	--só faz enable do próximo quando receber o enable pra si e a contagem dos anteriores todos acabar
---	s_monthEn <= (s_dayTerm and s_timeClk);
---	s_year1En <= (s_monthEn and s_monthTerm);
---	s_year2En <= (s_year1En and s_year1Term);
---	s_year3En <= (s_year2En and s_year2Term);
---	s_year4En <= (s_year3En and s_year3Term);
 
 
 	enables: process (CLOCK_50)
@@ -74,7 +64,7 @@ begin
 
 	
 	days_control : entity work.daysCntrl(Behavioral) --gera o numero máximo de dias
-						  port map(clk			=> CLOCK_50,
+						  port map(clk			=> CLOCK_50, --de acordo com o mes atual
 									  month 		=> s_month,
 									  max_days	=> s_max_days);
 	
@@ -83,7 +73,7 @@ begin
 							port map(max		=> s_max_days,
 										Res		=> s_Res,
 										clk		=> CLOCK_50,
-										En			=> s_timeClk,
+										En			=> s_timeClk, --1 Hz
 										Q			=> s_day,
 										TC			=> s_dayTerm);
 										
@@ -95,8 +85,7 @@ begin
 							
 							
 	month_counter : entity work.Counter5(RTL)
---							port map(max		=> std_logic_vector(to_unsigned(12,5)),
-							port map(max		=> std_logic_vector(to_unsigned(3,5)),
+							port map(max		=> std_logic_vector(to_unsigned(12,5)),
 										Res		=> s_Res,
 										clk		=> CLOCK_50,
 										En			=> s_monthEn,
@@ -144,13 +133,12 @@ begin
 	
 	
 	
-	
 	UpdateDisplay : entity work.DispCntrl(FSM)
 							port map(clk 		=> CLOCK_50,
 										res      => s_Res,
-										En 		=> s_dispClk,
-										selMux 	=> s_selMux,
-										selReg	=> s_regEn,
+										En 		=> s_dispClk, --1 ciclo por ms
+										selMux 	=> s_selMux, --seleciona a antrada do multiplexer
+										selReg	=> s_regEn, --seleciona o registro 
 										dispStart=> '1',
 										dispBusy => open);
 
@@ -177,8 +165,8 @@ begin
 	Reg_day_units : entity work.Register7(Behavioral)
 							port map(Res 		=> s_Res,
 										clk 		=> CLOCK_50,
-										En 		=> s_regEn(0),
-										D 			=> s_decodedValue,
+										En 		=> s_regEn(0), --enable que sai do disp cntrl
+										D 			=> s_decodedValue, --valor para ser registrado
 										Q 			=> HEX6);
 										
 										

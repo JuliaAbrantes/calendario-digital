@@ -24,7 +24,9 @@ begin
 			if(res = '1') then
 				Pstate <= WAITING;
 			else
-				Pstate <= Nstate;
+				if(En = '1') then
+					Pstate <= Nstate;
+				end if;
 			end if;
 		end if;
 	end process;
@@ -33,9 +35,9 @@ begin
 	combinational : process(Pstate, en, dispStart) --determina a saída
 	begin
 			case Pstate is
-			when WAITING 	=>
+			when WAITING 	=> --este estado era pra ser usado mais na parte 2
 				dispBusy <= '0';
-				if(en = '1' and dispStart = '1') then --começa a usar esta máquina
+				if(dispStart = '1') then --começa a usar esta máquina
 					Nstate <= s1;
 				else
 					Nstate <= WAITING;
@@ -43,49 +45,49 @@ begin
 				selMux <= "000";
 				selReg <= "00000000"; --não registra nenhum valor
 				
-			when s1 	=>
+			when s1 	=> --unidade dos dias
 				dispBusy <= '1';
 				Nstate <= s2;
 				selMux <= "000"; --seleciona a entrada sel + 1
 				selReg <= "00000001";
 				
-			when s2 		=>
+			when s2 		=> --dezena dos dias
 				dispBusy <= '1';
 				Nstate <= s3;
 				selMux <= "001";
 				selReg <= "00000010";
 				
-			when s3 	=>
+			when s3 	=> --unidade dos meses
 				dispBusy <= '1';
 				Nstate <= s4;
 				selMux <= "010";
 				selReg <= "00000100";
 				
-			when s4 	=>
+			when s4 	=> --dezena dos meses
 				dispBusy <= '1';
 				Nstate <= s5;
 				selMux <= "011";
 				selReg <= "00001000";
 				
-			when s5 	=>
+			when s5 	=> --unidade dos anos
 				dispBusy <= '1';
 				Nstate <= s6;
 				selMux <= "100";
 				selReg <= "00010000";
 				
-			when s6 	=>
+			when s6 	=> --dezena dos anos
 				dispBusy <= '1';
 				Nstate <= s7;
 				selMux <= "101";
 				selReg <= "00100000";
 				
-			when s7 	=>
+			when s7 	=> --centena dos anos
 				dispBusy <= '1';
 				Nstate <= s8;
 				selMux <= "110";
 				selReg <= "01000000";
 				
-			when s8 	=>
+			when s8 	=> --milhar dos anos
 				dispBusy <= '1';
 				Nstate <= s1;
 				selMux <= "111";

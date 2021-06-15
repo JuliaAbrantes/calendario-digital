@@ -4,6 +4,7 @@ use IEEE.NUMERIC_STD.all;
 
 entity mainCntrl is
 port (clk 		: in std_logic;
+		res		: in std_logic;
 		key0 		: in std_logic;
 		progBusy : in std_logic := '0';
 		dispBusy : in std_logic := '1';
@@ -22,6 +23,9 @@ begin
 	begin --autaliza o estado atual
 		if(rising_edge(clk)) then
 			Pstate <= Nstate;
+			if(res = '1') then
+				Pstate <= RUN;
+			end if;
 		end if;
 	end process;
 	
@@ -41,7 +45,7 @@ begin
 				leds <= "1010";
 				progStart <= '0';
 				dispStart <= '1';
-				if(key0 = '1') then --pare de executar
+				if(key0 = '1' and dispBusy = '0') then --só pode mudar pra prog se não estiver no processo de atualizar
 					Nstate <= PROG;
 				end if;
 			end case;

@@ -6,23 +6,28 @@ use IEEE.NUMERIC_STD.all;
 entity progCntrl is
 port(clk   	  : in std_logic;
 	  progStart: in std_logic;
+	  res		  : in std_logic;
 	  en		  : in std_logic;
 	  key	  	  : in std_logic_vector(2 downto 0);
-	  progBusy : out std_logic:='0';
+	  progBusy : out std_logic;
 	  sel      : out std_logic_vector(5 downto 0) --0, contador dos dias, até 5, o contador das dezenas dos anos
 	  );
 end progCntrl;
 
 architecture FSM of progCntrl is
-	type Tstate is (PROG_DAY, PROG_MONTH, PROG_YEAR_UNITS, PROG_YEAR_TENS, PROG_YEAR_HUND, PROG_YEAR_THOU);
-	signal Nstate, Pstate : Tstate := PROG_DAY;
+	type Tstate is (WAITING, PROG_DAY, PROG_MONTH, PROG_YEAR_UNITS, PROG_YEAR_TENS, PROG_YEAR_HUND, PROG_YEAR_THOU);
+	signal Nstate, Pstate : Tstate := WAITING;
 	signal s_sel : std_logic_vector(5 downto 0);
 begin
 
-	sequencial : process(en)
+	sequencial : process(clk)
 	begin
 		if(rising_edge(clk)) then
+			if (res = '1') then 
+				Pstate <= WAITING;
+				else
 			Pstate <= Nstate;
+			end if;
 		end if;
 	end process;
 
@@ -31,7 +36,13 @@ begin
 		Nstate <= Pstate;
 		progBusy <= '1';
 		s_sel <= "000000";
+		
 		case Pstate is
+			when WAITING =>
+				progBusy <= '0';
+				if (progStart = '1') then
+					Nstate <= PROG_DAY;
+				end if;
 		
 			when PROG_DAY =>
 				if(key(0) = '1') then
@@ -79,9 +90,9 @@ begin
 				end if;
 			
 			when PROG_YEAR_THOU =>
-				progBusy <= '0';
 				if(key(0) = '1') then
-					Nstate   <= PROG_DAY;
+					progBusy <= '0';
+					Nstate   <= WAITING;
 					
 				elsif(key(1) = '1') then
 					s_sel(5) <= '1';

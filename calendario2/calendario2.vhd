@@ -45,14 +45,6 @@ signal s_regEn : std_logic_vector(7 downto 0);
 
 begin
 
-
-	LEDR(16) <= counterSel(0);
-	LEDR(13) <= counterSel(1);
-	LEDR(10) <= counterSel(2);
-	LEDR(9) <= counterSel(3);
-	LEDR(8) <= counterSel(4);
-	LEDR(7) <= counterSel(5);
-
 	clearSW: process (CLOCK_50)
 	begin
 		if(rising_edge(CLOCK_50))then
@@ -91,17 +83,20 @@ begin
 
 	--só faz enable do próximo quando receber o enable pra si e a contagem dos anteriores todos acabar
 	--ou quando o progCntrl mandar incrementar
-	s_dayEn	 <= (s_timeClk and not s_progBusy) or (counterSel(0) and s_progBusy);
-	s_monthEn <= (s_dayTerm and s_timeClk and not s_progBusy) or (counterSel(1) and s_progBusy);
-	s_year1En <= (s_monthEn and s_monthTerm and not s_progBusy) or (counterSel(2) and s_progBusy);
-	s_year2En <= (s_year1En and s_year1Term and not s_progBusy) or (counterSel(3) and s_progBusy);
-	s_year3En <= (s_year2En and s_year2Term and not s_progBusy) or (counterSel(4) and s_progBusy);
-	s_year4En <= (s_year3En and s_year3Term and not s_progBusy) or (counterSel(5) and s_progBusy);
+	
+	s_dayEn	 <= (s_timeClk and s_dispBusy) or (counterSel(0) and s_progBusy);
+	s_monthEn <= (s_dayTerm and s_timeClk and s_dispBusy) or (counterSel(1) and s_progBusy);
+	s_year1En <= (s_monthEn and s_monthTerm and s_dispBusy) or (counterSel(2) and s_progBusy);
+	s_year2En <= (s_year1En and s_year1Term and s_dispBusy) or (counterSel(3) and s_progBusy);
+	s_year3En <= (s_year2En and s_year2Term and s_dispBusy) or (counterSel(4) and s_progBusy);
+	s_year4En <= (s_year3En and s_year3Term and s_dispBusy) or (counterSel(5) and s_progBusy);
 	
 	
 	
 	sync_gen : entity work.SyncGen(RTL)
 							port map(clkIn => CLOCK_50,
+										res 	  => s_Res,
+										en		  => s_dispBusy,
 										progClk => s_progClk,
 										timeClk => s_timeClk,
 										dispClk => s_dispClk);
@@ -176,6 +171,7 @@ begin
 	
 	TheMainCntrl : entity work.mainCntrl(FSM)
 							port map(clk 		 => CLOCK_50,
+										res 		 => s_Res,
 										key0 		 => s_key(0),
 										progBusy  => s_progBusy,
 										dispBusy	 => s_dispBusy,
@@ -185,6 +181,7 @@ begin
 										
 	ProgramCntrl : entity work.progCntrl(FSM)
 							port map(clk   	 => CLOCK_50,
+										res		 => s_Res,
 										progStart => s_progStart,
 										en		  	 => s_progClk,
 										key	  	 => s_key,
@@ -195,9 +192,12 @@ begin
 	
 	UpdateDisplay : entity work.DispCntrl(FSM)
 							port map(clk 		=> CLOCK_50,
+										res      => s_Res,
 										En 		=> s_dispClk,
 										selMux 	=> s_selMux,
-										selReg	=> s_regEn);
+										selReg	=> s_regEn,
+										dispBusy => s_dispBusy,
+										dispStart=> s_dispStart);
 
  
 	
@@ -222,7 +222,7 @@ begin
 	Reg_day_units : entity work.Register7(Behavioral)
 							port map(Res 		=> s_Res,
 										clk 		=> CLOCK_50,
-										En 		=> s_regEn(0),
+										En 		=> s_regEn(0) or (counterSel(0) and s_progBusy),
 										D 			=> s_decodedValue,
 										Q 			=> HEX6);
 										
@@ -230,7 +230,7 @@ begin
 	Reg_day_tens : entity work.Register7(Behavioral)
 							port map(Res 		=> s_Res,
 										clk 		=> CLOCK_50,
-										En 		=> s_regEn(1),
+										En 		=> s_regEn(1) or (counterSel(0) and s_progBusy),
 										D 			=> s_decodedValue,
 										Q 			=> HEX7);
 										
@@ -238,7 +238,7 @@ begin
 	Reg_month_units : entity work.Register7(Behavioral)
 							port map(Res 		=> s_Res,
 										clk 		=> CLOCK_50,
-										En 		=> s_regEn(2),
+										En 		=> s_regEn(2) or (counterSel(1) and s_progBusy),
 										D 			=> s_decodedValue,
 										Q 			=> HEX4);
 										
@@ -246,7 +246,7 @@ begin
 	Reg_month_tens : entity work.Register7(Behavioral)
 							port map(Res 		=> s_Res,
 										clk 		=> CLOCK_50,
-										En 		=> s_regEn(3),
+										En 		=> s_regEn(3) or (counterSel(1) and s_progBusy),
 										D 			=> s_decodedValue,
 										Q 			=> HEX5);
 										
@@ -254,7 +254,7 @@ begin
 	Reg_year_units : entity work.Register7(Behavioral)
 							port map(Res 		=> s_Res,
 										clk 		=> CLOCK_50,
-										En 		=> s_regEn(4),
+										En 		=> s_regEn(4) or (counterSel(2) and s_progBusy),
 										D 			=> s_decodedValue,
 										Q 			=> HEX0);
 										
@@ -262,7 +262,7 @@ begin
 	Reg_year_tens : entity work.Register7(Behavioral)
 							port map(Res 		=> s_Res,
 										clk 		=> CLOCK_50,
-										En 		=> s_regEn(5),
+										En 		=> s_regEn(5) or (counterSel(3) and s_progBusy),
 										D 			=> s_decodedValue,
 										Q 			=> HEX1);
 										
@@ -270,7 +270,7 @@ begin
 	Reg_year_hund : entity work.Register7(Behavioral)
 							port map(Res 		=> s_Res,
 										clk 		=> CLOCK_50,
-										En 		=> s_regEn(6),
+										En 		=> s_regEn(6) or (counterSel(4) and s_progBusy),
 										D 			=> s_decodedValue,
 										Q 			=> HEX2);
 										
@@ -278,9 +278,19 @@ begin
 	Reg_year_thou : entity work.Register7(Behavioral)
 							port map(Res 		=> s_Res,
 										clk 		=> CLOCK_50,
-										En 		=> s_regEn(7),
+										En 		=> s_regEn(7) or (counterSel(5) and s_progBusy),
 										D 			=> s_decodedValue,
 										Q 			=> HEX3);
+										
+	
+
+	LEDR(16) <= counterSel(0);
+	LEDR(13) <= counterSel(1);
+	LEDR(10) <= counterSel(2);
+	LEDR(9)  <= counterSel(3);
+	LEDR(8)  <= counterSel(4);
+	LEDR(7)  <= counterSel(5);
+	LEDR(17) <= s_progBusy;
 
 	
 	

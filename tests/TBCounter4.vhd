@@ -6,7 +6,7 @@ entity TBCounter4 is
 end TBCounter4;
 
 architecture stimulus of TBCounter4 is
-	signal s_max : natural := 9;
+	signal s_max : std_logic_vector(3 downto 0);
 	signal s_Res, CLOCK_50, s_En, s_TC : std_logic;
 	signal s_Q : std_logic_vector(3 downto 0);
 
@@ -24,17 +24,17 @@ end process;
 
 counter_stim : process
 begin
-	s_Res <= '1';
-	wait for cycle/2;
 	s_Res <= '0';
-	s_max <= 4;
+	s_max <= "0100";
 	s_En <= '1';
 	wait for cycle;
 	s_En <= '0';
 	wait for cycle*10;
+	s_Res <= '1';
+	wait for cycle;
 end process;
 
-uut : entity work.Counter4(Behavioral)
+uut : entity work.simpleCounter(Behavioral)
 port map( max => s_max,
 			 Res => s_Res,
 			 clk => CLOCK_50,

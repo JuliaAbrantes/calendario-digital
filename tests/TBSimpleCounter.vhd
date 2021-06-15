@@ -6,7 +6,7 @@ entity TBSimpleCounter is
 end TBSimpleCounter;
 
 architecture stimulus of TBSimpleCounter is
-	signal s_max : natural := 9;
+	signal s_max : std_logic_vector(3 downto 0);
 	signal s_Res, CLOCK_50, s_En, s_TC : std_logic;
 	signal s_Q : std_logic_vector(3 downto 0);
 
@@ -27,7 +27,7 @@ begin
 	s_Res <= '1';
 	wait for cycle/2;
 	s_Res <= '0';
-	s_max <= 4;
+	s_max <= "0100";
 	s_En <= '1';
 	wait for cycle;
 	s_En <= '0';

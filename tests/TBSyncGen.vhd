@@ -8,39 +8,34 @@ end TBSyncGen;
 
 
 architecture simulation of TBSyncGen is
-	signal 
+	signal s_clock, s_res, s_en, s_timeClk, s_dispClk: std_logic;
 	constant cycle : time := 20 ns;
 
 begin
 
 	clock: process
 	begin
-		clk <= '0';
+		s_clock <= '0';
 		wait for cycle/2;
-		clk <= '1';
+		s_clock <= '1';
 		wait for cycle/2;
 	end process;
 	
 	
 	stim : process
 	begin
-		wait for cycle * 500;
-		s_SW <= "1";
-		wait for cycle;
-		s_SW <= "0";
+		s_res <= '0';
+		wait for cycle*500000000;
+		s_res <= '1';
+		wait for cycle*50000000;
 	end process;
 
 
-	uut: entity work.calendario(Structural)
-	port map( SW 		=> s_SW,
-				 CLOCK_50=> clk,
-				 HEX0		=> s_HEX0,
-				 HEX1		=> s_HEX1,
-				 HEX2		=> s_HEX2,
-				 HEX3		=> s_HEX3,
-				 HEX4		=> s_HEX4,
-				 HEX5		=> s_HEX5,
-				 HEX6		=> s_HEX6,
-				 HEX7		=> s_HEX7);
+	uut: entity work.SyncGen(RTL)
+	port map( clkIn	=> s_clock,
+				 res		=> s_res,
+				 en		=> s_en,
+				 timeClk => s_timeClk,
+				 dispClk => s_dispClk);
 
 end simulation;

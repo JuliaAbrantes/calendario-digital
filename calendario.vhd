@@ -4,7 +4,6 @@ use IEEE.NUMERIC_STD.all;
 
 entity calendario is
 	port(SW			: in  std_logic_vector(0 downto 0);
-		  KEY			: in  std_logic_vector(2 downto 0);
 		  CLOCK_50	: in  std_logic;
 		  HEX0		: out std_logic_vector(6 downto 0);
 		  HEX1		: out std_logic_vector(6 downto 0);
@@ -13,13 +12,11 @@ entity calendario is
 		  HEX4		: out std_logic_vector(6 downto 0);
 		  HEX5		: out std_logic_vector(6 downto 0);
 		  HEX6		: out std_logic_vector(6 downto 0);
-		  HEX7		: out std_logic_vector(6 downto 0);
-		  LEDG		: out std_logic_vector(0 downto 0));
+		  HEX7		: out std_logic_vector(6 downto 0));
 end calendario;
 
 architecture Structural of calendario is
-	signal s_Res, s_progClk, s_timeClk, s_dispClk: std_logic;
-	signal s_key : std_logic_vector(2 downto 0);
+	signal s_Res, s_timeClk, s_dispClk: std_logic;
 
 	signal s_dayTerm, s_monthTerm, s_year1Term, s_year2Term, s_year3Term : std_logic := '0';
 	signal s_monthEn, s_year1En, s_year2En, s_year3En, s_year4En : std_logic := '0';
@@ -49,29 +46,29 @@ begin
 	end process;
 
 	--só faz enable do próximo quando receber o enable pra si e a contagem dos anteriores todos acabar
-	s_monthEn <= (s_dayTerm and s_timeClk);
-	s_year1En <= (s_monthEn and s_monthTerm);
-	s_year2En <= (s_year1En and s_year1Term);
-	s_year3En <= (s_year2En and s_year2Term);
-	s_year4En <= (s_year3En and s_year3Term);
-	
-	
---debouncer do key 0 (reset geral)
-	key0: entity work.DebounceUnit(Behavioral)
-	generic map(kHzClkFreq		=> 50000,
-	            mSecMinInWidth => 100,
-			      inPolarity		=> '0',
-			      outPolarity		=>'1')
-	port map (refClk	  	=>  CLOCK_50,
-		       dirtyIn		=>  KEY(0),
-		       pulsedOut	=>  s_key(0));
-	
-	
+--	s_monthEn <= (s_dayTerm and s_timeClk);
+--	s_year1En <= (s_monthEn and s_monthTerm);
+--	s_year2En <= (s_year1En and s_year1Term);
+--	s_year3En <= (s_year2En and s_year2Term);
+--	s_year4En <= (s_year3En and s_year3Term);
+
+
+	enables: process (CLOCK_50)
+	begin
+		if(rising_edge(CLOCK_50))then
+			s_monthEn <= s_dayTerm and s_timeClk;
+			s_year1En <= s_monthTerm and s_dayTerm and s_timeClk;
+			s_year2En <= s_year1Term and s_monthTerm and s_dayTerm and s_timeClk;
+			s_year3En <= s_year2Term and s_year1Term and s_monthTerm and s_dayTerm and s_timeClk;
+			s_year4En <= s_year3Term and s_year2Term and s_year1Term and s_monthTerm and s_dayTerm and s_timeClk;
+		end if;
+	end process;
 	
 	
 	sync_gen : entity work.SyncGen(RTL)
-							port map(clkIn => CLOCK_50,
-										progClk => s_progClk,
+							port map(clkIn   => CLOCK_50,
+										res 	  => s_Res,
+										en		  => '1',
 										timeClk => s_timeClk,
 										dispClk => s_dispClk);
 
@@ -98,7 +95,8 @@ begin
 							
 							
 	month_counter : entity work.Counter5(RTL)
-							port map(max		=> std_logic_vector(to_unsigned(12,5)),
+--							port map(max		=> std_logic_vector(to_unsigned(12,5)),
+							port map(max		=> std_logic_vector(to_unsigned(3,5)),
 										Res		=> s_Res,
 										clk		=> CLOCK_50,
 										En			=> s_monthEn,
@@ -149,9 +147,12 @@ begin
 	
 	UpdateDisplay : entity work.DispCntrl(FSM)
 							port map(clk 		=> CLOCK_50,
+										res      => s_Res,
 										En 		=> s_dispClk,
 										selMux 	=> s_selMux,
-										selReg	=> s_regEn);
+										selReg	=> s_regEn,
+										dispStart=> '1',
+										dispBusy => open);
 
  
 	
